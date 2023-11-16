@@ -89,19 +89,19 @@ spec:
             tag: v5.2
           extraEnvs:
           - name: TYK_DB_ENABLEDELETEKEYBYHASH
-            value: true
+            value: "true"
           - name: TYK_DB_ENABLEUPDATEKEYBYHASH
-            value: true
+            value: "true"
           - name: TYK_DB_ENABLEHASHEDKEYSLISTING
-            value: true
+            value: "true"
         gateway:
           image:
             tage: v5.2
           extraEnvs:
           - name: TYK_GW_POLICIES_ALLOWEXPLICITPOLICYID
-            value: true
+            value: "true"
           - name: TYK_GW_ENABLEHASHEDKEYSLISTING
-            value: true
+            value: "true"
         pump:
           image:
             repository: tykio/tyk-pump-docker-pub
