@@ -9,7 +9,7 @@ metadata:
     release: prometheus
     chart: prometheus-19.6.1
     heritage: Helm
-  name: prometheuss
+  name: prometheus
   namespace: istio-system
   annotations:
     {}
