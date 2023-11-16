@@ -83,12 +83,24 @@ Password: topsecretpassword
 
 Generate JWT from Keycloak:
 ```
-JWT=$(curl -L -s -X POST 'http://localhost:7000/realms/keycloak-oauth/protocol/openid-connect/token' \
+curl -L -s -X POST 'http://localhost:7000/realms/keycloak-oauth/protocol/openid-connect/token' \
+   -H 'Content-Type: application/x-www-form-urlencoded' \
+   --data-urlencode 'client_id=keycloak-oauth' \
+   --data-urlencode 'grant_type=password' \
+   --data-urlencode 'client_secret=NoTgoLZpbrr5QvbNDIRIvmZOhe9wI0r0' \
+   --data-urlencode 'scope=openid' \
+   --data-urlencode 'username=admin@example.com' \
+   --data-urlencode 'password=topsecretpassword' | jq -r '.access_token'
+```
+or
+
+```
+curl -L -s -X POST 'http://localhost:7000/realms/keycloak-oauth/protocol/openid-connect/token' \
    -H 'Content-Type: application/x-www-form-urlencoded' \
    --data-urlencode 'client_id=keycloak-oauth' \
    --data-urlencode 'grant_type=password' \
    --data-urlencode 'client_secret=NoTgoLZpbrr5QvbNDIRIvmZOhe9wI0r0' \
    --data-urlencode 'scope=openid' \
    --data-urlencode 'username=developer@example.com' \
-   --data-urlencode 'password=topsecretpassword' | jq -r '.access_token')
+   --data-urlencode 'password=topsecretpassword' | jq -r '.access_token'
 ```
