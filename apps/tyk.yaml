@@ -72,7 +72,7 @@ spec:
       values: |
         redis:
           addrs:
-            - tyk-redis.tyk.svc:6379
+            - redis.tyk.svc:6379
         backend: postgres
         postgres: 
           host: tyk-postgres-postgresql.tyk.svc
@@ -82,6 +82,7 @@ spec:
           sslmode: disable
         dash:
           adminUser:
+          license: license
             email: default@example.com
             password: topsecretpassword
           image:
