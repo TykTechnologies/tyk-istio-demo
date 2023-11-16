@@ -48,11 +48,11 @@ spec:
   jwt_identity_base_field: sub
   jwt_policy_field_name: pol
   jwt_default_policies:
-    - tyk/no-op
+    - apis/no-op
   jwt_scope_claim_name: group
   jwt_scope_to_policy_mapping:
-    admins: tyk/httpbin-admins
-    developers: tyk/httpbin-developers
+    admins: apis/httpbin-admins
+    developers: apis/httpbin-developers
 ---
 apiVersion: tyk.tyk.io/v1alpha1
 kind: SecurityPolicy
@@ -64,7 +64,7 @@ spec:
   active: true
   access_rights_array:
     - name: httpbin-jwt
-      namespace: httpbin
+      namespace: apis
       versions:
         - Default
 ---
@@ -78,7 +78,7 @@ spec:
   active: true
   access_rights_array:
     - name: httpbin-jwt
-      namespace: httpbin
+      namespace: apis
       versions:
         - Default
       allowed_urls:

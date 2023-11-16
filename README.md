@@ -58,9 +58,16 @@ Install Apps
 kubectl apply -f apps
 ```
 
-You can expose the Tyk Gateway to your localhost using the following command:
+You can expose the Tyk Dashboard and Gateway to your localhost using the following commands:
 ```
+kubectl port-forward svc/dashboard-svc-tyk-stack-tyk-pro --namespace tyk 3000
 kubectl port-forward svc/gateway-svc-tyk-stack-tyk-pro --namespace tyk 8080
+```
+
+You can access the Tyk Dashboard instance in your browser at [localhost:3000](http://localhost:3000):
+```
+Username: default@example.com
+Password: topsecretpassword
 ```
 
 You can expose Keycloak to your localhost using the following command:
