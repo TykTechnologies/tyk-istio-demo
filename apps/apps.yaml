@@ -11,13 +11,11 @@ spec:
   source:
     repoURL: https://github.com/TykTechnologies/tyk-istio-demo.git
     targetRevision: HEAD
-    path: resources/httpbin
+    path: resources/apps
   destination:
     server: https://kubernetes.default.svc
-    namespace: httpbin
+    namespace: apps
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
