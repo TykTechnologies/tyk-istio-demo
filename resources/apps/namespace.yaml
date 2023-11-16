@@ -2,6 +2,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: apps
+  name: applications
   labels:
     istio-injection: enabled

@@ -43,3 +43,105 @@ spec:
       targetPort: 8080
   selector:
     app: httpbin
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: ApiDefinition
+metadata:
+  name: httpbin
+spec:
+  name: httpbin
+  protocol: http
+  active: true
+  proxy:
+    target_url: http://httpbin-svc.applications.svc:8000
+    listen_path: /httpbin
+    strip_listen_path: true
+  enable_detailed_recording: true
+  use_keyless: true
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: ApiDefinition
+metadata:
+  name: no-operation
+spec:
+  name: no-operation
+  protocol: http
+  active: true
+  proxy:
+    target_url: http://httpbingo.org
+    listen_path: /no-operation
+    strip_listen_path: true
+  use_standard_auth: true
+  auth_configs:
+    authToken:
+      auth_header_name: Authorization
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: no-operation
+spec:
+  name: no-operation
+  state: active
+  active: true
+  access_rights_array:
+    - name: no-operation
+      namespace: applications
+      versions:
+        - Default
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: ApiDefinition
+metadata:
+  name: httpbin-keycloak
+spec:
+  name: httpbin-keycloak
+  protocol: http
+  active: true
+  proxy:
+    target_url: http://httpbin-svc.applications.svc:8000
+    listen_path: /httpbin-keycloak
+    strip_listen_path: true
+  enable_jwt: true
+  jwt_signing_method: rsa
+  jwt_source: http://keycloak-service.keycloak.svc:7000/realms/keycloak-oauth/protocol/openid-connect/certs
+  jwt_identity_base_field: sub
+  jwt_policy_field_name: pol
+  jwt_default_policies:
+    - applications/no-operation
+  jwt_scope_claim_name: group
+  jwt_scope_to_policy_mapping:
+    admins: applications/httpbin-admins
+    developers: applications/httpbin-developers
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: httpbin-admins
+spec:
+  name: httpbin-admins
+  state: active
+  active: true
+  access_rights_array:
+    - name: httpbin-keycloak
+      namespace: applications
+      versions:
+        - Default
+---
+apiVersion: tyk.tyk.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: httpbin-developers
+spec:
+  name: httpbin-developers
+  state: active
+  active: true
+  access_rights_array:
+    - name: httpbin-keycloak
+      namespace: applications
+      versions:
+        - Default
+      allowed_urls:
+        - url: /xml
+          methods:
+            - GET

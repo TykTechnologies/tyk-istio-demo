@@ -73,7 +73,7 @@ spec:
               fields:
                 - user
           config:
-            url: tyk://YXBpcy91c2Vycy1yZXN0/users/{{.arguments.id}}
+            url: tyk://YXBwbGljYXRpb25zL3VzZXJzLXJlc3Q/users/{{.arguments.id}}
             method: GET
             body: ""
             headers: {}
@@ -85,7 +85,7 @@ spec:
               fields:
                 - posts
           config:
-            url: tyk://YXBpcy9wb3N0cy1yZXN0/users/{{.object.id}}/posts
+            url: tyk://YXBwbGljYXRpb25zL3Bvc3RzLXJlc3Q/users/{{.object.id}}/posts
             method: GET
             body: ""
             headers: {}
@@ -97,7 +97,7 @@ spec:
               fields:
                 - comments
           config:
-            url: tyk://YXBpcy9jb21tZW50cy1yZXN0/posts/{{.object.id}}/comments
+            url: tyk://YXBwbGljYXRpb25zL2NvbW1lbnRzLXJlc3Q/posts/{{.object.id}}/comments
             method: GET
             body: ""
             headers: {}
