@@ -39,6 +39,11 @@ You can get the ArgoCD admin password by running the following command:
 kubectl get secrets -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
+### Istio
+```
+istioctl install -y
+```
+
 ### Install ArgoCD Apps
 
 The apps that will be installed are:
@@ -50,7 +55,7 @@ The apps that will be installed are:
 Install Apps
 
 ```
-kubectl apply -f example/apps
+kubectl apply -f apps
 ```
 
 You can expose the Tyk Gateway to your localhost using the following command:

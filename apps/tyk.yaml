@@ -2,20 +2,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redis-cluster
+  name: redis
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   source:
-    repoURL: https://charts.bitnami.com/bitnami
-    chart: redis-cluster
-    targetRevision: v7.6.4
+    repoURL: https://helm.tyk.io/public/helm/charts
+    chart: simple-redis
+    targetRevision: v0.1.1
     helm:
       releaseName: tyk-redis
-      values: |
-        password=topsecretpassword
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
@@ -72,18 +70,16 @@ spec:
     helm:
       releaseName: tyk-stack
       values: |
+        redis:
+          addrs:
+            - tyk-redis.tyk.svc:6379
         backend: postgres
         postgres: 
-          host: tyk-storage-postgres-postgresql.tyk.svc
+          host: tyk-postgres-postgresql.tyk.svc
           port: 5432
           password: topsecretpassword
           database: storage
           sslmode: disable
-        redis:
-          addrs:
-          - tyk-redis-redis-cluster.tyk.svc:6379
-          pass: topsecretpassword
-          enableCluster: true
         dash:
           adminUser:
             email: default@example.com
