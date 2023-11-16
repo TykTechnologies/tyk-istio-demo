@@ -2,9 +2,9 @@
 apiVersion: tyk.tyk.io/v1alpha1
 kind: ApiDefinition
 metadata:
-  name: no-op
+  name: no-operation
 spec:
-  name: no-op
+  name: no-operation
   protocol: http
   active: true
   proxy:
@@ -19,14 +19,14 @@ spec:
 apiVersion: tyk.tyk.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: no-op
+  name: no-operation
 spec:
-  name: no-op
+  name: no-operation
   state: active
   active: true
   access_rights_array:
-    - name: no-op
-      namespace: httpbin
+    - name: no-operation
+      namespace: apis
       versions:
         - Default
 ---
@@ -48,7 +48,7 @@ spec:
   jwt_identity_base_field: sub
   jwt_policy_field_name: pol
   jwt_default_policies:
-    - apis/no-op
+    - apis/no-operation
   jwt_scope_claim_name: group
   jwt_scope_to_policy_mapping:
     admins: apis/httpbin-admins
