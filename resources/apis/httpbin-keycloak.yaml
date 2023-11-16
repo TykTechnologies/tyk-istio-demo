@@ -51,8 +51,8 @@ spec:
     - apis/no-op
   jwt_scope_claim_name: group
   jwt_scope_to_policy_mapping:
-    admins: apis/httpbin-keycloak-admins
-    developers: apis/httpbin-keycloak-developers
+    admins: YXBpcy9odHRwYmluLWtleWNsb2FrLWFkbWlucw
+    developers: YXBpcy9odHRwYmluLWtleWNsb2FrLWRldmVsb3BlcnM
 ---
 apiVersion: tyk.tyk.io/v1alpha1
 kind: SecurityPolicy
