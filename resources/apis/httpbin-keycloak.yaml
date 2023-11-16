@@ -9,7 +9,7 @@ spec:
   active: true
   proxy:
     target_url: http://httpbingo.org
-    listen_path: /no-op
+    listen_path: /no-operation
     strip_listen_path: true
   use_standard_auth: true
   auth_configs:
@@ -33,14 +33,14 @@ spec:
 apiVersion: tyk.tyk.io/v1alpha1
 kind: ApiDefinition
 metadata:
-  name: httpbin-jwt
+  name: httpbin-keycloak
 spec:
-  name: httpbin-jwt
+  name: httpbin-keycloak
   protocol: http
   active: true
   proxy:
     target_url: http://httpbin-svc.apps.svc:8000
-    listen_path: /httpbin-jwt
+    listen_path: /httpbin-keycloak
     strip_listen_path: true
   enable_jwt: true
   jwt_signing_method: rsa
@@ -63,7 +63,7 @@ spec:
   state: active
   active: true
   access_rights_array:
-    - name: httpbin-jwt
+    - name: httpbin-keycloak
       namespace: apis
       versions:
         - Default
@@ -77,7 +77,7 @@ spec:
   state: active
   active: true
   access_rights_array:
-    - name: httpbin-jwt
+    - name: httpbin-keycloak
       namespace: apis
       versions:
         - Default
