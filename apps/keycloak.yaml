@@ -1,0 +1,75 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TykTechnologies/tyk-istio-demo.git
+    targetRevision: HEAD
+    path: resources/keycloak-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-postgres
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: v13.2.3
+    helm:
+      releaseName: keycloak-postgres
+      values: |
+        auth:
+          database: keycloak-db
+          postgresPassword: topsecretpassword
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TykTechnologies/tyk-istio-demo.git
+    targetRevision: HEAD
+    path: resources/keycloak
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

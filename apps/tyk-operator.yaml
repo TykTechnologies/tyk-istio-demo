@@ -1,0 +1,54 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.10.1
+    helm:
+      releaseName: cert-manager
+      values: |
+        installCRDs: true
+        prometheus:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tyk-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.tyk.io/public/helm/charts
+    chart: tyk-operator
+    targetRevision: v0.15.1
+    helm:
+      releaseName: tyk-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

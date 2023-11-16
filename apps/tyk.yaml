@@ -1,0 +1,108 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-cluster
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: redis-cluster
+    targetRevision: v7.6.4
+    helm:
+      releaseName: tyk-redis
+      values: |
+        password=topsecretpassword
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tyk-postgres
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: v13.2.3
+    helm:
+      releaseName: tyk-postgres
+      values: |
+        auth:
+          database: storage
+          postgresPassword: topsecretpassword
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tyk
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.tyk.io/public/helm/charts
+    chart: tyk-pro
+    targetRevision: v0.14.1
+    helm:
+      releaseName: tyk-stack
+      values: |
+        backend: postgres
+        postgres: 
+          host: tyk-storage-postgres-postgresql.tyk.svc
+          port: 5432
+          password: topsecretpassword
+          database: storage
+          sslmode: disable
+        redis:
+          addrs:
+          - tyk-redis-redis-cluster.tyk.svc:6379
+          pass: topsecretpassword
+          enableCluster: true
+        dash:
+          adminUser:
+            email: default@example.com
+            password: topsecretpassword
+          image:
+            tag: v5.2
+        gateway:
+          image:
+            tage: v5.2
+        pump:
+          image:
+            repository: tykio/tyk-pump-docker-pub
+            tag: v1.8
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tyk
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
