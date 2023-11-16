@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apps
+  name: apis
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "3"
@@ -11,10 +11,10 @@ spec:
   source:
     repoURL: https://github.com/TykTechnologies/tyk-istio-demo.git
     targetRevision: HEAD
-    path: resources/apps
+    path: resources/apis
   destination:
     server: https://kubernetes.default.svc
-    namespace: apps
+    namespace: apis
   syncPolicy:
     automated:
       prune: true
