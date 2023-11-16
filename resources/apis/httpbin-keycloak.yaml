@@ -51,22 +51,7 @@ spec:
     - apis/no-op
   jwt_scope_claim_name: group
   jwt_scope_to_policy_mapping:
-    admins: apis/httpbin-admins
     developers: apis/httpbin-developers
----
-apiVersion: tyk.tyk.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: httpbin-admins
-spec:
-  name: httpbin-admins
-  state: active
-  active: true
-  access_rights_array:
-    - name: httpbin-keycloak
-      namespace: apis
-      versions:
-        - Default
 ---
 apiVersion: tyk.tyk.io/v1alpha1
 kind: SecurityPolicy

@@ -89,6 +89,6 @@ JWT=$(curl -L -s -X POST 'http://localhost:7000/realms/keycloak-oauth/protocol/o
    --data-urlencode 'grant_type=password' \
    --data-urlencode 'client_secret=NoTgoLZpbrr5QvbNDIRIvmZOhe9wI0r0' \
    --data-urlencode 'scope=openid' \
-   --data-urlencode 'username=admin@example.com' \
+   --data-urlencode 'username=developer@example.com' \
    --data-urlencode 'password=topsecretpassword' | jq -r '.access_token')
 ```
