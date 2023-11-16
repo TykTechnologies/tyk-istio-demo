@@ -11,6 +11,6 @@ spec:
   internal: true
   use_keyless: true
   proxy:
-    target_url: http://posts-rest-svc.applications.svc:3102/
+    target_url: http://posts-rest-svc.apps.svc:3102/
     listen_path: /posts-rest
     strip_listen_path: true
