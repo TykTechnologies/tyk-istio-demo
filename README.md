@@ -1,4 +1,4 @@
-# Merge JWKS Demo
+# Tyk Istio Demo
 
 ## Requirements
 1. [minikube](https://minikube.sigs.k8s.io/docs/start/)
