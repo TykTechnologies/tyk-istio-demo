@@ -32,15 +32,19 @@ spec:
   source:
     repoURL: https://charts.bitnami.com/bitnami
     chart: redis
-    targetRevision: 18.12.1
+    targetRevision: 19.6.2
     helm:
       parameters:
-        - name: image.tag
-          value: 6.2.13
+        - name: replica.replicaCount
+          value: "0"
         - name: auth.existingSecret
           value: tyk-backend-secrets
         - name: auth.password
           value: redis-password
+        - name: master.resourcesPreset
+          value: "none"
+        - name: replica.resourcesPreset
+          value: "none"
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
@@ -63,13 +67,11 @@ spec:
   source:
     repoURL: https://charts.bitnami.com/bitnami
     chart: postgresql
-    targetRevision: 12.12.10
+    targetRevision: 15.5.18
     helm:
       parameters:
         - name: auth.database
           value: tyk_analytics
-        - name: image.tag
-          value: 15.5.0-debian-11-r18
         - name: global.postgresql.auth.existingSecret
           value: tyk-backend-secrets
   destination:
@@ -94,7 +96,7 @@ spec:
   source:
     repoURL: https://helm.tyk.io/public/helm/charts
     chart: tyk-stack
-    targetRevision: 1.4.0
+    targetRevision: 1.6.0
     helm:
       parameters:
         - name: global.license.dashboard
@@ -112,8 +114,6 @@ spec:
           value: tyk-backend-secrets
         - name: global.postgres.connectionStringSecret.keyName
           value: postgresURL
-        - name: global.secrets.APISecret
-          value: BananaSplit42
         - name: global.components.bootstrap
           value: 'true'
         - name: tyk-bootstrap.bootstrap.dashboard
