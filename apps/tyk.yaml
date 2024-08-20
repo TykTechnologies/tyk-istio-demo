@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/TykTechnologies/tyk-istio-demo'
-    path: resources/tyk/tyk-backend-secrets
+    path: resources/tyk
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
