@@ -2,13 +2,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tyk-config-secrets
+  name: tyk-backend-secrets
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   source:
     repoURL: 'https://github.com/TykTechnologies/tyk-istio-demo'
-    path: apps/tyk-config-secrets
+    path: resources/tyk/tyk-backend-secrets
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
@@ -36,7 +38,7 @@ spec:
         - name: image.tag
           value: 6.2.13
         - name: auth.existingSecret
-          value: tyk-redispgsql-secrets
+          value: tyk-backend-secrets
         - name: auth.password
           value: redis-password
   destination:
@@ -69,7 +71,7 @@ spec:
         - name: image.tag
           value: 15.5.0-debian-11-r18
         - name: global.postgresql.auth.existingSecret
-          value: tyk-redispgsql-secrets
+          value: tyk-backend-secrets
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
@@ -101,13 +103,13 @@ spec:
         - name: global.adminUser.password
           value: topsecretpassword
         - name: global.redis.passSecret.name
-          value: tyk-redispgsql-secrets
+          value: tyk-backend-secrets
         - name: global.redis.passSecret.keyName
           value: redis-password
         - name: global.redis.addrs
           value: 'tyk-redis-master.tyk.svc:6379'
         - name: global.postgres.connectionStringSecret.name
-          value: tyk-redispgsql-secrets
+          value: tyk-backend-secrets
         - name: global.postgres.connectionStringSecret.keyName
           value: postgresURL
         - name: global.secrets.APISecret
