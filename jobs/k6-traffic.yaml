@@ -1,0 +1,13 @@
+apiVersion: k6.io/v1alpha1
+kind: K6
+metadata:
+  name: k6-traffic
+  namespace: k6
+spec:
+  parallelism: 4
+  separate: false
+  quiet: "false"
+  script:
+    configMap:
+      name: k6-traffic
+      file: load.js
