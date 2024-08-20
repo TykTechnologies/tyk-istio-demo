@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-traffic
+data:
+  load.js: |
+    import http from 'k6/http';
+    import {sleep} from 'k6';
+    import {randomIntBetween} from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+    export const options = {
+        insecureSkipTLSVerify: true,
+        discardResponseBodies: true,
+        scenarios: {
+            success: {
+                executor: 'constant-vus',
+                exec: 'success',
+                vus: 50,
+                duration: '60m',
+            },
+            failure: {
+                executor: 'constant-vus',
+                exec: 'error',
+                vus: 10,
+                duration: '60m',
+            },
+            status: {
+                executor: 'constant-vus',
+                exec: 'status',
+                vus: 50,
+                duration: '60m',
+            },
+            differentPath: {
+                executor: 'constant-vus',
+                exec: 'differentPath',
+                vus: 100,
+                duration: '60m',
+            },
+            differentMethod: {
+                executor: 'constant-vus',
+                exec: 'differentMethod',
+                vus: 100,
+                duration: '60m',
+            },
+            breakingSlo: {
+                executor: 'per-vu-iterations',
+                exec: 'breakingSlo',
+                vus: 50,
+                iterations: 100,
+                maxDuration: '15m',
+            },
+            udg: {
+                executor: 'constant-vus',
+                exec: 'sendUDG',
+                vus: 100,
+                duration: '60m',
+            }
+        }
+    };
+    
+    export function sendUDG() {
+        var payload;
+        var params;
+        
+        payload = JSON.stringify({
+            query: 'query { user(id: ' + randomIntBetween(0, 9) + ') { name email posts { title body comments { name email body } } } }',
+        });
+        
+        params = {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        
+        http.post('http://istio-ingressgateway.istio-system.svc:80/udg', payload, params)
+    }
+
+    function sendStatus(status) {
+        http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/status/' + status);
+        sleep(1);
+    }
+
+    export function success() {
+        sendStatus(200);
+        sleep(1);
+    }
+
+    export function breakingSlo() {
+        sendStatus(502);
+        sleep(1);
+    }
+
+    export function status() {
+        switch (randomIntBetween(1, 20)) {
+            case 1:
+                sendStatus(500); break;
+            case 2: case 3:
+                sendStatus(404); break;
+            default:
+                sendStatus(200);
+        }
+        sleep(1);
+    }
+
+    export function error() {
+        switch (randomIntBetween(1, 5)) {
+            case 1:
+                sendStatus(400); break;
+            case 2:
+                sendStatus(404); break;
+            case 3:
+                sendStatus(500); break;
+            case 4:
+                sendStatus(502); break;
+            case 5:
+                sendStatus(503); break;
+        }
+        sleep(randomIntBetween(1, 5)); // sleep between 1 and 5 seconds.
+    }
+
+    export function differentPath() {
+        switch (randomIntBetween(1, 5)) {
+            case 1:
+                http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/cache'); break;
+            case 2:
+                http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/ip'); break;
+            case 3:
+                http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/headers'); break;
+            case 4:
+                http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/user-agent'); break;
+            default:
+                http.get('http://istio-ingressgateway.istio-system.svc:80/httpbin/image'); break;
+        }
+        
+        if (randomIntBetween(1, 7) === 1) {
+            sendStatus(500);
+        }
+        sleep(1);
+    }
+
+    export function differentMethod() {
+        var payload;
+        var params;
+        
+        payload = JSON.stringify({
+            content: 'Hello Tyk',
+        });
+        
+        params = {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        
+        switch (randomIntBetween(1, 5)) {
+            case 1:
+                http.post("http://istio-ingressgateway.istio-system.svc:80/httpbin/post", payload, params);
+                break;
+            case 2:
+                http.patch("http://istio-ingressgateway.istio-system.svc:80/httpbin/patch", payload, params);
+                break;
+            case 3:
+                http.del("http://istio-ingressgateway.istio-system.svc:80/httpbin/delete", payload, params);
+                break;
+            case 4:
+                http.put("http://istio-ingressgateway.istio-system.svc:80/httpbin/put", payload, params);
+                break;
+            case 5:
+                http.post("http://istio-ingressgateway.istio-system.svc:80/httpbin/response-headers", payload, params);
+                break;
+        }
+        sleep(1);
+    }
