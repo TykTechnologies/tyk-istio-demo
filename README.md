@@ -29,17 +29,17 @@ You can expose ArgoCD UI using the following command:
 kubectl port-forward svc/argocd-server --namespace argocd 8443:443
 ```
 
-You can access the Keycloak instance in your browser at [localhost:8443](http://localhost:8443):
-```
-Username: admin
-```
-
 You can get the ArgoCD admin password by running the following command:
 ```
 kubectl get secrets -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-### Istio
+You can access the ArgoCD UI in your browser at [localhost:8443](http://localhost:8443):
+```
+Username: admin
+```
+
+### Install Istio into cluster
 ```
 istioctl install -y
 ```
@@ -54,14 +54,15 @@ The apps that will be installed are:
 
 Install Apps
 
+Replace YOUR-LICENSE-GOES-HERE with your Tyk self-managed license in ./apps/tyk.yaml
 ```
 kubectl apply -f apps
 ```
 
 You can expose the Tyk Dashboard and Gateway to your localhost using the following commands:
 ```
-kubectl port-forward svc/dashboard-svc-tyk-stack-tyk-pro --namespace tyk 3000
-kubectl port-forward svc/gateway-svc-tyk-stack-tyk-pro --namespace tyk 8080
+kubectl port-forward svc/dashboard-svc-tyk-stack-tyk-dashboard --namespace tyk 3000
+kubectl port-forward svc/gateway-svc-tyk-stack-tyk-gateway --namespace tyk 8080
 ```
 
 You can access the Tyk Dashboard instance in your browser at [localhost:3000](http://localhost:3000):
@@ -69,6 +70,20 @@ You can access the Tyk Dashboard instance in your browser at [localhost:3000](ht
 Username: default@example.com
 Password: topsecretpassword
 ```
+
+You can expose the Istio Ingress and Kiali to your localhost using the following commands:
+```
+kubectl port-forward svc/istio-ingressgateway --namespace istio-system 8085:80
+kubectl port-forward svc/kiali -n istio-system 20001:20001
+```
+
+Send some traffic via ingress gateway
+```
+curl localhost:8085/httpbin/get
+```
+
+View Kiali Graph in your browser at [localhost:20001](http://localhost:20001)
+
 
 You can expose Keycloak to your localhost using the following command:
 ```

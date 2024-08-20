@@ -2,18 +2,45 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redis
+  name: tyk-backend-secrets
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   source:
-    repoURL: https://helm.tyk.io/public/helm/charts
-    chart: simple-redis
-    targetRevision: v0.1.1
+    repoURL: 'https://github.com/TykTechnologies/tyk-istio-demo'
+    path: resources/tyk/tyk-backend-secrets
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: tyk
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tyk-redis
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: redis
+    targetRevision: 18.12.1
     helm:
-      releaseName: tyk-redis
+      parameters:
+        - name: image.tag
+          value: 6.2.13
+        - name: auth.existingSecret
+          value: tyk-backend-secrets
+        - name: auth.password
+          value: redis-password
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
@@ -36,14 +63,15 @@ spec:
   source:
     repoURL: https://charts.bitnami.com/bitnami
     chart: postgresql
-    targetRevision: v13.2.3
+    targetRevision: 12.12.10
     helm:
-      releaseName: tyk-postgres
-      values: |
-        auth:
-          database: storage
-          postgresPassword: topsecretpassword
-
+      parameters:
+        - name: auth.database
+          value: tyk_analytics
+        - name: image.tag
+          value: 15.5.0-debian-11-r18
+        - name: global.postgresql.auth.existingSecret
+          value: tyk-backend-secrets
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
@@ -57,7 +85,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tyk
+  name: tyk-stack
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -65,47 +93,33 @@ spec:
   project: default
   source:
     repoURL: https://helm.tyk.io/public/helm/charts
-    chart: tyk-pro
-    targetRevision: v0.14.1
+    chart: tyk-stack
+    targetRevision: 1.4.0
     helm:
-      releaseName: tyk-stack
-      values: |
-        redis:
-          addrs:
-          - redis.tyk.svc:6379
-        backend: postgres
-        postgres: 
-          host: tyk-postgres-postgresql.tyk.svc
-          port: 5432
-          password: topsecretpassword
-          database: storage
-          sslmode: disable
-        dash:
-          license: license
-          adminUser:
-            email: default@example.com
-            password: topsecretpassword
-          image:
-            tag: v5.2
-          extraEnvs:
-          - name: TYK_DB_ENABLEDELETEKEYBYHASH
-            value: "true"
-          - name: TYK_DB_ENABLEUPDATEKEYBYHASH
-            value: "true"
-          - name: TYK_DB_ENABLEHASHEDKEYSLISTING
-            value: "true"
-        gateway:
-          image:
-            tage: v5.2
-          extraEnvs:
-          - name: TYK_GW_POLICIES_ALLOWEXPLICITPOLICYID
-            value: "true"
-          - name: TYK_GW_ENABLEHASHEDKEYSLISTING
-            value: "true"
-        pump:
-          image:
-            repository: tykio/tyk-pump-docker-pub
-            tag: v1.8
+      parameters:
+        - name: global.license.dashboard
+          value: >-
+            YOUR-LICENSE-GOES-HERE
+        - name: global.adminUser.password
+          value: topsecretpassword
+        - name: global.redis.passSecret.name
+          value: tyk-backend-secrets
+        - name: global.redis.passSecret.keyName
+          value: redis-password
+        - name: global.redis.addrs
+          value: 'tyk-redis-master.tyk.svc:6379'
+        - name: global.postgres.connectionStringSecret.name
+          value: tyk-backend-secrets
+        - name: global.postgres.connectionStringSecret.keyName
+          value: postgresURL
+        - name: global.secrets.APISecret
+          value: BananaSplit42
+        - name: global.components.bootstrap
+          value: 'true'
+        - name: tyk-bootstrap.bootstrap.dashboard
+          value: 'true'
+        - name: tyk-bootstrap.bootstrap.portal
+          value: 'false'
   destination:
     server: https://kubernetes.default.svc
     namespace: tyk
