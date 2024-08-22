@@ -73,6 +73,7 @@ data:
         };
         
         http.post('http://istio-ingressgateway.istio-system.svc:80/udg', payload, params)
+        sleep(1);
     }
 
     function sendStatus(status) {
